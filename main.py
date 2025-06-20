@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Depends
+from fastapi import FastAPI, Depends,Query
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from typing import List
@@ -32,7 +32,15 @@ def get_db():
         yield db
     finally:
         db.close()
-
+from sqlalchemy import text
 @app.get("/paises", response_model=List[ItemResponse])
-def get_paises(db: Session = Depends(get_db)):
-    return db.query(DBItem).all()
+def get_paises(query: str = Query(None), db: Session = Depends(get_db)):
+        if query:
+            sql = text(f"SELECT * FROM codigo_pais WHERE pais = '{query}'")
+            result = db.execute(sql)
+        else:
+            sql = text("SELECT * FROM codigo_pais")
+            result = db.execute(sql)
+
+        rows = result.mappings().all()
+        return rows
