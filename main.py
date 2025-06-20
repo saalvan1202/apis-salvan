@@ -4,9 +4,15 @@ from pydantic import BaseModel
 from typing import List
 from models import Item as DBItem
 from database import SessionLocal, engine, Base
-
+from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
-
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # ⚠️ Peligroso en producción
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 # Crear las tablas si no existen
 Base.metadata.create_all(bind=engine)
 
